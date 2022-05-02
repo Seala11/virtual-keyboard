@@ -1,5 +1,8 @@
 .textarea {
-    margin: 10px auto 10px;
-    width: 100%;
-    resize: vertical;
+  width: 99%;
+  min-height: 200px;
+  margin: 10px auto 10px;
+  resize: vertical;
+  outline: none !important;
+  border-radius: 4px;
 }
