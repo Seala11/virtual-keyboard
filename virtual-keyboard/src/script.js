@@ -1,4 +1,6 @@
 require('normalize.css/normalize.css');
 import './sass/main.scss';
 
-console.log('here');
+import App from './js/app';
+
+App.init();
