@@ -9,13 +9,10 @@ html {
 
 body {
   @include roboto();
-  background: $light-xl;
+  background: $light;
 }
 
 h1 {
   @include roboto($fw: 700, $fs: 2rem);
-  }
-
-h2 {
-  @include roboto($fw: 500, $fs: 1.5rem);
+  text-align: center;
 }

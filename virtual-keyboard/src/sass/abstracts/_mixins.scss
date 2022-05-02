@@ -2,7 +2,7 @@
 @use '../base/typography' as *;
 
 // default font weight regular
-@mixin roboto($fs: 1rem, $fw: 400, $color: $dark-l, $ls: 0.06em) {
+@mixin roboto($fs: 1rem, $fw: 400, $color: $dark-m, $ls: 0.06em) {
     font-family: $ff-roboto;
     font-size: $fs;
     font-weight: $fw;
