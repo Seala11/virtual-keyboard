@@ -6,7 +6,7 @@
 // - text: string => inner html text
 // - type: string => for buttons
 
-export class DOMHelper {
+export default class DOMHelper {
   static createEl(tag, properties = {}) {
     // 1. create element (required)
     let element;

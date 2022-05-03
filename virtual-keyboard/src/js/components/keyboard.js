@@ -1,12 +1,13 @@
 // keyboard element
-import { DOMHelper } from '../utility/DOMHelper';
+
+import DOMHelper from '../utility/DOMHelper';
 import Key from './keys';
 
 class Keyboard {
   constructor() {
     this.keyLayout = [
-      ['backquote','1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'minus', 'equal', 'backspace'],
-      ['tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'bracketLeft', 'bracketRight' , 'backslash', 'del'],
+      ['backquote', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'minus', 'equal', 'backspace'],
+      ['tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'bracketLeft', 'bracketRight', 'backslash', 'del'],
       ['capsLock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'semicolon', 'quote', 'enter'],
       ['shiftLeft', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'comma', 'period', 'slash', 'up', 'shiftRight'],
       ['ctrlLeft', 'win', 'altLeft', 'space', 'altRight', 'left', 'down', 'right', 'ctrlRight'],
@@ -20,13 +21,13 @@ class Keyboard {
     const keyboard = this.section;
 
     // create 5 rows of buttons
-    this.keyLayout.forEach(row => {
-        const rowEl = DOMHelper.createEl('div', { class: ['keyboard__keys'] });
-        row.forEach(keyName => {
-            const button = new Key(keyName).createKey();
-            rowEl.append(button);
-        })
-        keyboard.append(rowEl);
+    this.keyLayout.forEach((row) => {
+      const rowEl = DOMHelper.createEl('div', { class: ['keyboard__keys'] });
+      row.forEach((keyName) => {
+        const button = new Key(keyName).createKey();
+        rowEl.append(button);
+      });
+      keyboard.append(rowEl);
     });
 
     return keyboard;

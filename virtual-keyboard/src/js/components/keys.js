@@ -1,5 +1,5 @@
-import { DOMHelper } from '../utility/DOMHelper';
-import { keysEng } from '../data/keysData';
+import DOMHelper from '../utility/DOMHelper';
+import data from '../data/keysData';
 
 export default class Key {
   constructor(keyName) {
@@ -9,9 +9,10 @@ export default class Key {
   createKey() {
     // find the data for this key from the data object
     let keyData;
-    for (const obj of keysEng) {
-      if (obj.keyName === this.keyName) {
-        keyData = obj;
+    for (let i = 0; i < data.length; i += 1) {
+      if (data[i].keyName === this.keyName) {
+        keyData = data[i];
+        break;
       }
     }
 

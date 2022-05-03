@@ -1,4 +1,4 @@
-export const keysEng = [
+export default [
   {
     keyName: 'backquote',
     value: '`',
