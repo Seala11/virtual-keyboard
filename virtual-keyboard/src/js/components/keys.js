@@ -28,13 +28,9 @@ export default class Key {
     return button;
   }
 
-  textareaHandler(event) {
-    // for keydown not to print letter twice
-    event.preventDefault();
-
+  textareaHandler() {
     // set the cursor in the textarea
     this.textarea.focus();
-    this.keyButton.classList.add('active');
 
     // get the cursor position to insert text before/after/between
     const cursorPosStart = this.textarea.selectionStart;
@@ -51,7 +47,7 @@ export default class Key {
 
     if (buttonAttr === 'Backspace') {
       // backspace - remove last char from textarea
-      if (cursorPosStart > 0) {
+      if (cursorPosStart > 0 || (cursorPosStart === 0 && cursorPosEnd !== 0)) {
         currValue = textBefore.slice(0, textBefore.length - 1);
         this.textarea.value = `${currValue}${textAfter}`;
         this.textarea.selectionStart = cursorPosStart - 1;
