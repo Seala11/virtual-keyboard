@@ -20,7 +20,7 @@ export default class App {
     wrapperEl.append(textareaSectionEl);
 
     // create keyboard
-    const keyBoardEl = new Keyboard().setKeyboard();
+    const keyBoardEl = new Keyboard(textareaEl).section;
     wrapperEl.append(keyBoardEl);
 
     // create footer

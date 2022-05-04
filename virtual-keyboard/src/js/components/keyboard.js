@@ -2,16 +2,15 @@
 
 import DOMHelper from '../utility/DOMHelper';
 import Key from './keys';
+import keysLayout from '../data/keysLayout';
 
 class Keyboard {
-  constructor() {
-    this.keyLayout = [
-      ['backquote', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'minus', 'equal', 'backspace'],
-      ['tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'bracketLeft', 'bracketRight', 'backslash', 'del'],
-      ['capsLock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'semicolon', 'quote', 'enter'],
-      ['shiftLeft', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'comma', 'period', 'slash', 'up', 'shiftRight'],
-      ['ctrlLeft', 'win', 'altLeft', 'space', 'altRight', 'left', 'down', 'right', 'ctrlRight'],
-    ];
+  constructor(textarea) {
+    this.keysLayout = keysLayout;
+    this.textarea = textarea;
+    this.keys = {};
+    this.section = this.setKeyboard();
+    this.eventListenersHandler();
   }
 
   // method to create a section with board and buttons inside
@@ -21,11 +20,12 @@ class Keyboard {
     const keyboard = this.section;
 
     // create 5 rows of buttons
-    this.keyLayout.forEach((row) => {
+    this.keysLayout.forEach((row) => {
       const rowEl = DOMHelper.createEl('div', { class: ['keyboard__keys'] });
       row.forEach((keyName) => {
-        const button = new Key(keyName).createKey();
-        rowEl.append(button);
+        const button = new Key(keyName, this.textarea);
+        this.keys[keyName] = button; // set the whole class
+        rowEl.append(button.keyButton); // append the element
       });
       keyboard.append(rowEl);
     });
@@ -33,15 +33,39 @@ class Keyboard {
     return keyboard;
   }
 
-  //   //private method to set active class to clicked key and display it in textarea
-  //   #triggerEvent(handlerName) {
-  //     console.log(`event name ${handlerName}`);
-  //   }
+  // add event listeners on press (document) and click(keyboard section)
+  eventListenersHandler() {
+    document.addEventListener('keydown', (event) => {
+      this.keyboardEventHandler(event);
+    });
+    document.addEventListener('keyup', (event) => {
+      this.keyboardEventHandler(event);
+    });
+    this.section.addEventListener('click', (event) => {
+      this.mouseEventHandler(event);
+    });
+  }
 
-  //   //private method for caps lock turned on / off
-  //   #toggleCapsLock() {
-  //     console.log(`caps lock toggled`);
-  //   }
+  keyboardEventHandler(event) {
+    // find the button code that pressed
+    const keyEventAttr = event.code;
+    const currButton = this.keys[keyEventAttr];
+
+    if (event.type === 'keyup') {
+      currButton.keyButton.classList.remove('active');
+    } else {
+      currButton.textareaHandler(event);
+    }
+  }
+
+  mouseEventHandler(event) {
+    // find the button attribute that clicked
+    const buttonAttr = event.target.getAttribute('data-key');
+    // if not the button
+    if (buttonAttr === null) return;
+    const currButton = this.keys[buttonAttr];
+    currButton.textareaHandler(event);
+  }
 }
 
 export default Keyboard;

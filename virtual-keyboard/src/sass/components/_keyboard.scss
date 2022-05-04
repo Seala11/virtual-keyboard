@@ -39,15 +39,15 @@
     -webkit-tap-highlight-color: transparent;
     transition: box-shadow 10ms ease-in-out;
 
-    &[data-key = 'shiftLeft'],
-    &[data-key = 'shiftRight'],
-    &[data-key = 'enter'],
-    &[data-key = 'backspace'],
-    &[data-key = 'capsLock'] {
+    &[data-key = 'ShiftLeft'],
+    &[data-key = 'ShiftRight'],
+    &[data-key = 'Enter'],
+    &[data-key = 'Backspace'],
+    &[data-key = 'CapsLock'] {
       width: 12%;
     }
 
-    &[data-key = 'space'] {
+    &[data-key = 'Space'] {
       width: 47%;
     }
 
@@ -61,4 +61,9 @@
       box-shadow: 0px 0px 0px 1px rgb(87 104 101 / 30%), inset 0px 0px 2px 0px rgb(134 186 161);
     }
   }
+}
+
+.active {
+  background: linear-gradient(135deg, rgb(185, 251, 192) 0%, rgb(236, 255, 238) 100%);
+  box-shadow: 0px 0px 0px 1px rgb(87 104 101 / 30%), inset 0px 0px 2px 0px rgb(134 186 161);
 }
