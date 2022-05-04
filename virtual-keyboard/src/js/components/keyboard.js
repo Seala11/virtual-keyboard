@@ -26,6 +26,7 @@ class Keyboard {
         const button = new Key(keyName, this.textarea);
         this.keys[keyName] = button; // set the whole class
         rowEl.append(button.keyButton); // append the element
+        // button.keyButton.addEventListener('mouseenter', this.hoverKeyHandler);
       });
       keyboard.append(rowEl);
     });
@@ -33,7 +34,7 @@ class Keyboard {
     return keyboard;
   }
 
-  // add event listeners on press (document) and click(keyboard section)
+  // add event listeners on press(document) and click/hover(keyboard section only)
   eventListenersHandler() {
     document.addEventListener('keydown', (event) => {
       this.keyboardEventHandler(event);
@@ -41,20 +42,30 @@ class Keyboard {
     document.addEventListener('keyup', (event) => {
       this.keyboardEventHandler(event);
     });
-    this.section.addEventListener('click', (event) => {
+    this.section.addEventListener('mousedown', (event) => {
       this.mouseEventHandler(event);
+    });
+    Object.values(this.keys).forEach((key) => {
+      key.keyButton.addEventListener('mouseenter', () => key.keyButton.classList.add('hover'));
+      key.keyButton.addEventListener('mouseout', () => key.keyButton.classList.remove('hover'));
     });
   }
 
   keyboardEventHandler(event) {
+    // for keydown not to print letter twice
+    event.preventDefault();
+
     // find the button code that pressed
     const keyEventAttr = event.code;
     const currButton = this.keys[keyEventAttr];
 
     if (event.type === 'keyup') {
-      currButton.keyButton.classList.remove('active');
+      setTimeout(() => {
+        currButton.keyButton.classList.remove('active');
+      }, 100);
     } else {
-      currButton.textareaHandler(event);
+      currButton.keyButton.classList.add('active');
+      currButton.textareaHandler();
     }
   }
 
@@ -62,9 +73,24 @@ class Keyboard {
     // find the button attribute that clicked
     const buttonAttr = event.target.getAttribute('data-key');
     // if not the button
-    if (buttonAttr === null) return;
+    if (!buttonAttr) return;
+
+    // get button element, add text to textarea, set active class
     const currButton = this.keys[buttonAttr];
-    currButton.textareaHandler(event);
+
+    currButton.textareaHandler();
+    currButton.keyButton.classList.add('active');
+
+    // if button unpressed or cursor leaves the button element
+    currButton.keyButton.addEventListener('mouseout', this.removeActiveClass, false);
+    currButton.keyButton.addEventListener('mouseup', this.removeActiveClass, false);
+  }
+
+  // for mouseEventHandler => if button unpressed or cursor leaves the button element
+  removeActiveClass(event) {
+    event.target.classList.remove('active');
+    event.target.removeEventListener('mouseout', this.removeActiveClass);
+    event.target.removeEventListener('mouseup', this.removeActiveClass);
   }
 }
 

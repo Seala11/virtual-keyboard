@@ -1,8 +1,13 @@
+@use '../abstracts/mixins' as *;
+@use '../abstracts/variables' as *;
+
 .textarea {
-  width: 99%;
+  width: 97%;
   min-height: 200px;
   margin: 10px auto 10px;
   resize: vertical;
   outline: none !important;
   border-radius: 4px;
+  padding: 10px;
+  @include roboto($fw: 400, $color: $dark-m);
 }
