@@ -41,12 +41,16 @@ class Keyboard {
   // if shift/ capslock / lang changed
   switchKeyboard() {
     Object.values(this.keys).forEach((key) => {
-      const { keyButton } = key;
-      console.log(this.CapsIsOn);
-      if (this.CapsIsOn && key.value.length === 1) {
-        keyButton.innerHTML = key.value.toUpperCase();
-      } else if (!this.CapsIsOn && key.value.length === 1) {
-        keyButton.innerHTML = key.value.toLowerCase();
+      const { keyButton, value } = key;
+      if (
+        (this.CapsIsOn && value.length === 1) ||
+        (!this.CapsIsOn && key.value.length === 1)
+      ) {
+        const currVal = keyButton.innerHTML;
+        keyButton.innerHTML =
+          currVal.toUpperCase() === currVal ?
+            currVal.toLowerCase() :
+            currVal.toUpperCase();
       }
     });
   }
@@ -85,6 +89,14 @@ class Keyboard {
         currButton.keyButton.classList.remove('active');
       }, 100);
     } else {
+      // prevent capsLock on/off while keydowm
+      if (
+        currButton.keyName === 'CapsLock' &&
+        currButton.keyButton.classList.contains('active')
+      ) {
+        return;
+      }
+
       currButton.keyButton.classList.add('active');
       currButton.textareaHandler();
     }

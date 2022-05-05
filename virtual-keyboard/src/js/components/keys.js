@@ -33,6 +33,13 @@ export default class Key {
       attr: this.keyName,
     });
 
+    if (this.keyName === 'CapsLock') {
+      const capsIndicator = DOMHelper.createEl('div', {
+        class: ['key__capsLock'],
+      });
+      button.append(capsIndicator);
+    }
+
     return button;
   }
 
@@ -54,7 +61,6 @@ export default class Key {
     let currValue;
 
     if (buttonAttr === 'Backspace') {
-      // backspace - remove last char from textarea
       if (cursorPosStart > 0 || (cursorPosStart === 0 && cursorPosEnd !== 0)) {
         currValue = textBefore.slice(0, textBefore.length - 1);
         textarea.value = `${currValue}${textAfter}`;
@@ -62,13 +68,11 @@ export default class Key {
         textarea.selectionEnd = cursorPosStart - 1;
       }
     } else if (buttonAttr === 'Tab') {
-      // tab - add two space
       currValue = '  ';
       textarea.value = `${textBefore}${currValue}${textAfter}`;
       textarea.selectionStart = cursorPosStart + 2;
       textarea.selectionEnd = cursorPosStart + 2;
     } else if (buttonAttr === 'Delete') {
-      // del - remove prev char from the textarea
       if (cursorPosEnd < this.textarea.value.length) {
         textarea.value = `${textBefore}${textAfter.slice(1)}`;
         textarea.selectionStart = cursorPosStart;
@@ -81,7 +85,7 @@ export default class Key {
     ) {
       textarea.selectionStart = cursorPosStart;
       textarea.selectionEnd = cursorPosStart;
-      this.toggleUpperCase(buttonAttr);
+      this.toggleUpperCase(buttonAttr, this.keyButton);
     } else if (
       buttonAttr === 'ControlLeft' ||
       buttonAttr === 'AltLeft' ||
@@ -93,7 +97,6 @@ export default class Key {
       textarea.selectionStart = cursorPosStart;
       textarea.selectionEnd = cursorPosStart;
     } else if (buttonAttr === 'Enter') {
-      // enter - move coursor to the new line
       textarea.value = `${textBefore}\n${textAfter}`;
       textarea.selectionStart = cursorPosStart + 1;
       textarea.selectionEnd = cursorPosStart + 1;
@@ -105,21 +108,22 @@ export default class Key {
     }
   }
 
-  toggleUpperCase(buttonAttr) {
+  toggleUpperCase(buttonAttr, key) {
+    let { CapsIsOn } = this.keyboard;
     if (buttonAttr === 'CapsLock') {
-      console.log(this.CapsIsOn);
-      if (!this.keyboard.CapsIsOn) {
-        console.log('was false now true');
-        this.keyboard.CapsIsOn = true;
+      if (!CapsIsOn) {
+        CapsIsOn = true;
         this.keyboard.switchKeyboard();
-      } else if (this.keyboard.CapsIsOn) {
-        console.log('was true now false');
-        this.keyboard.CapsIsOn = false;
+        this.toggleCapsLock(key);
+      } else if (CapsIsOn) {
+        CapsIsOn = false;
         this.keyboard.switchKeyboard();
+        this.toggleCapsLock(key);
       }
     }
 
-    if (buttonAttr === 'ShiftLeft') { // TODO: change all like caps now, but if one shift is pressed other is disabled
+    if (buttonAttr === 'ShiftLeft') {
+      // TODO: change all like caps now, but if one shift is pressed other is disabled
       if (this.shiftLeftIsOn) {
         console.log('here');
       } else {
@@ -135,5 +139,11 @@ export default class Key {
       }
     }
     console.log('done');
+  }
+
+  toggleCapsLock(btn) {
+    const capsIndicator = btn.children[0];
+    capsIndicator.classList.toggle('key__capsLock--on');
+    return this;
   }
 }

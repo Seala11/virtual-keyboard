@@ -32,33 +32,62 @@
     background: $gradienr-btn;
     border: none;
     border-radius: 4px;
-    box-shadow: 0px 1px 2px 1px rgb(80 98 130 / 60%), inset 0px -1px 1px 0px rgb(176 184 198);
+    box-shadow: 0px 1px 2px 1px rgb(80 98 130 / 60%),
+      inset 0px -1px 1px 0px rgb(176 184 198);
     min-width: 40px;
     outline: none;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: box-shadow 150ms ease-in-out;
 
-    &[data-key = 'ShiftLeft'],
-    &[data-key = 'ShiftRight'],
-    &[data-key = 'Enter'],
-    &[data-key = 'Backspace'],
-    &[data-key = 'CapsLock'] {
+    &[data-key='ShiftLeft'],
+    &[data-key='ShiftRight'],
+    &[data-key='Enter'],
+    &[data-key='Backspace'] {
       width: 12%;
     }
 
-    &[data-key = 'Space'] {
+    &[data-key='Space'] {
       width: 47%;
+    }
+
+    &[data-key='CapsLock'] {
+      width: 12%;
+      position: relative;
     }
   }
 }
 
-.hover{
+.key {
+  &__capsLock {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    top: 3px;
+    right: 4px;
+    background-color: $light-xxl;
+    box-shadow: inset 0px 0px 2px 0px $active-m;
+    border-radius: 50%;
+  }
+
+  &__capsLock--on {
+    background-color: $active-inner;
+    box-shadow: inset 0px 0px 2px 0px $active-border;
+  }
+}
+
+.hover {
   background: $gradient-btn-active;
-  box-shadow: 0px 1px 2px 1px rgb(87 104 101 / 60%), inset 0px -1px 1px 0px rgb(134 186 161);
+  box-shadow: 0px 1px 2px 1px rgb(87 104 101 / 60%),
+    inset 0px -1px 1px 0px rgb(134 186 161);
 }
 
 .active {
-  background: linear-gradient(135deg, rgb(185, 251, 192) 0%, rgb(236, 255, 238) 100%);
-  box-shadow: 0px 0px 0px 1px rgb(87 104 101 / 30%), inset 0px 0px 2px 0px rgb(134 186 161);
+  background: linear-gradient(
+    135deg,
+    rgb(185, 251, 192) 0%,
+    rgb(236, 255, 238) 100%
+  );
+  box-shadow: 0px 0px 0px 1px rgb(87 104 101 / 30%),
+    inset 0px 0px 2px 0px rgb(134 186 161);
 }
