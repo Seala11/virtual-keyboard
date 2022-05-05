@@ -17,7 +17,7 @@ class Keyboard {
     this.CapsIsOn = false;
   }
 
-  // method to create a section with board and buttons inside
+  // create a section with keyboard and buttons inside
   setKeyboard() {
     // create a section with board
     this.section = DOMHelper.createEl('section', { class: ['keyboard'] });
@@ -39,23 +39,39 @@ class Keyboard {
   }
 
   // if shift/ capslock / lang changed
-  switchKeyboard() {
+  switchKeyboard(buttonAttr) {
+    const shiftIsPressed =
+      buttonAttr === 'ShiftLeft' || buttonAttr === 'ShiftRight';
+    const capsLockIsPressed = buttonAttr === 'CapsLock';
+
     Object.values(this.keys).forEach((key) => {
-      const { keyButton, value } = key;
-      if (
-        (this.CapsIsOn && value.length === 1) ||
-        (!this.CapsIsOn && key.value.length === 1)
-      ) {
-        const currVal = keyButton.innerHTML;
+      const { keyButton, en } = key;
+
+      if (shiftIsPressed) {
+        const currVal = keyButton.innerHTML; // 'a'
+        const currLang = en; // ['a', 'A']
+        if (currLang[1] === null) return; // ['Delete', null]
         keyButton.innerHTML =
-          currVal.toUpperCase() === currVal ?
-            currVal.toLowerCase() :
-            currVal.toUpperCase();
+          currVal === currLang[0] ? currLang[1] : currLang[0];
+      }
+
+      if (capsLockIsPressed && en[0].length === 1) {
+        const currVal = keyButton.innerHTML;
+        let changedVal;
+        if (currVal.toUpperCase() === currVal) {
+          changedVal = currVal.toLowerCase();
+        } else {
+          changedVal = currVal.toUpperCase();
+        }
+        keyButton.innerHTML = changedVal;
+        // keyButton.innerHTML = currVal.toUpperCase() === currVal
+        //     ? currVal.toLowerCase()
+        //     : currVal.toUpperCase();
       }
     });
   }
 
-  // add event listeners on press(document) and click/hover(keyboard section only)
+  // add event listeners on press(document) and click/hover(buttons only)
   eventListenersHandler() {
     document.addEventListener('keydown', (event) => {
       this.keyboardEventHandler(event);
@@ -81,19 +97,33 @@ class Keyboard {
     event.preventDefault();
 
     // find the button code that pressed
-    const keyEventAttr = event.code;
-    const currButton = this.keys[keyEventAttr];
+    const keyAttr = event.code;
+    const currButton = this.keys[keyAttr];
+    const currBtnIsShift =
+      currButton.keyName === 'ShiftLeft' || currButton.keyName === 'ShiftRight';
 
+    // KEYUP EVENTS
     if (event.type === 'keyup') {
+      if (currBtnIsShift) {
+        currButton.textareaHandler();
+      }
+
       setTimeout(() => {
         currButton.keyButton.classList.remove('active');
       }, 100);
+
+      // KEYDOWN EVENTS
     } else {
       // prevent capsLock on/off while keydowm
       if (
         currButton.keyName === 'CapsLock' &&
         currButton.keyButton.classList.contains('active')
       ) {
+        return;
+      }
+
+      // prevent shift on/off while keydowm or other shift pressed
+      if (currBtnIsShift && (this.shiftLeftIsOn || this.shiftRightIsOn)) {
         return;
       }
 
@@ -115,23 +145,7 @@ class Keyboard {
     currButton.keyButton.classList.add('active');
 
     // if button unpressed or cursor leaves the button element
-    currButton.keyButton.addEventListener(
-      'mouseout',
-      this.removeActiveClass,
-      false,
-    );
-    currButton.keyButton.addEventListener(
-      'mouseup',
-      this.removeActiveClass,
-      false,
-    );
-  }
-
-  // for mouseEventHandler => if button unpressed or cursor leaves the button element
-  removeActiveClass(event) {
-    event.target.classList.remove('active');
-    event.target.removeEventListener('mouseout', this.removeActiveClass);
-    event.target.removeEventListener('mouseup', this.removeActiveClass);
+    currButton.addMouseEvents();
   }
 }
 

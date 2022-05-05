@@ -5,9 +5,12 @@ export default class Key {
   constructor(keyName) {
     this.keyName = keyName;
     this.keyData = this.setData();
-    this.value = this.keyData.value;
+    this.en = this.keyData.en;
     this.valOnShift = this.keyData.valueOnShift;
     this.keyButton = this.createKey();
+    this.buttonActive = false;
+
+    this.lang = 'en';
   }
 
   setData() {
@@ -28,7 +31,7 @@ export default class Key {
   createKey() {
     const button = DOMHelper.createEl('button', {
       class: ['keyboard__key'],
-      text: this.value,
+      text: this.en[0],
       type: 'button',
       attr: this.keyName,
     });
@@ -109,41 +112,63 @@ export default class Key {
   }
 
   toggleUpperCase(buttonAttr, key) {
-    let { CapsIsOn } = this.keyboard;
+    const { CapsIsOn, shiftLeftIsOn, shiftRightIsOn } = this.keyboard;
     if (buttonAttr === 'CapsLock') {
       if (!CapsIsOn) {
-        CapsIsOn = true;
-        this.keyboard.switchKeyboard();
+        this.keyboard.CapsIsOn = true;
+        this.keyboard.switchKeyboard(buttonAttr);
         this.toggleCapsLock(key);
       } else if (CapsIsOn) {
-        CapsIsOn = false;
-        this.keyboard.switchKeyboard();
+        this.keyboard.CapsIsOn = false;
+        this.keyboard.switchKeyboard(buttonAttr);
         this.toggleCapsLock(key);
       }
     }
 
     if (buttonAttr === 'ShiftLeft') {
-      // TODO: change all like caps now, but if one shift is pressed other is disabled
-      if (this.shiftLeftIsOn) {
-        console.log('here');
-      } else {
+      if (!shiftLeftIsOn) {
         this.keyboard.shiftLeftIsOn = true;
+        this.keyboard.switchKeyboard(buttonAttr);
+      } else if (shiftLeftIsOn) {
+        this.keyboard.shiftLeftIsOn = false;
+        this.keyboard.switchKeyboard(buttonAttr);
       }
     }
 
     if (buttonAttr === 'ShiftRight') {
-      if (this.shiftRightIsOn) {
-        console.log('here');
-      } else {
-        this.keyboard.shiftLeftIsOn = true;
+      if (!shiftRightIsOn) {
+        this.keyboard.shiftRightIsOn = true;
+        this.keyboard.switchKeyboard(buttonAttr);
+      } else if (shiftRightIsOn) {
+        this.keyboard.shiftRightIsOn = false;
+        this.keyboard.switchKeyboard(buttonAttr);
       }
     }
-    console.log('done');
   }
 
+  // add style to capslock active green button
   toggleCapsLock(btn) {
     const capsIndicator = btn.children[0];
     capsIndicator.classList.toggle('key__capsLock--on');
     return this;
   }
+
+  // for mouseEventHandler => if button unpressed or cursor leaves the button element
+  addMouseEvents() {
+    this.keyButton.addEventListener('mouseout', this.removeMouseEvents);
+    this.keyButton.addEventListener('mouseup', this.removeMouseEvents);
+  }
+
+  removeMouseEvents = () => {
+    if (
+      this.keyName === 'ShiftLeft' ||
+      this.keyName === 'ShiftRight'
+    ) {
+      this.toggleUpperCase(this.keyName, this.keyButton);
+    }
+
+    this.keyButton.classList.remove('active');
+    this.keyButton.removeEventListener('mouseout', this.removeMouseEvents);
+    this.keyButton.removeEventListener('mouseup', this.removeMouseEvents);
+  };
 }
