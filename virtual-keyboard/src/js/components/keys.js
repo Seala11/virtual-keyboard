@@ -2,25 +2,33 @@ import DOMHelper from '../utility/DOMHelper';
 import data from '../data/keysData';
 
 export default class Key {
-  constructor(keyName, textarea) {
+  constructor(keyName) {
     this.keyName = keyName;
-    this.textarea = textarea;
+    this.keyData = this.setData();
+    this.value = this.keyData.value;
+    this.valOnShift = this.keyData.valueOnShift;
     this.keyButton = this.createKey();
   }
 
-  createKey() {
+  setData() {
     // find the data for this key from the data object
     let keyData;
     for (let i = 0; i < data.length; i += 1) {
       if (data[i].keyName === this.keyName) {
         keyData = data[i];
+        this.keyData = keyData;
+        this.value = keyData.value;
+        this.valOnShift = keyData.valueOnShift;
         break;
       }
     }
+    return keyData;
+  }
 
+  createKey() {
     const button = DOMHelper.createEl('button', {
       class: ['keyboard__key'],
-      text: keyData.value,
+      text: this.value,
       type: 'button',
       attr: this.keyName,
     });
@@ -29,19 +37,19 @@ export default class Key {
   }
 
   textareaHandler() {
-    // set the cursor in the textarea
-    this.textarea.focus();
+    // set the cursor in the textarea (this.keyboard => keyboard class object)
+    const { textarea } = this.keyboard;
+    textarea.focus();
 
     // get the cursor position to insert text before/after/between
-    const cursorPosStart = this.textarea.selectionStart;
-    const cursorPosEnd = this.textarea.selectionEnd;
-    const textBefore = this.textarea.value.slice(0, cursorPosStart);
-    const textAfter = this.textarea.value.slice(cursorPosEnd);
+    const cursorPosStart = textarea.selectionStart;
+    const cursorPosEnd = textarea.selectionEnd;
+    const textBefore = textarea.value.slice(0, cursorPosStart);
+    const textAfter = textarea.value.slice(cursorPosEnd);
 
     // depends on the attribute modify the text
     // after each modification change cursor position
     const buttonAttr = this.keyButton.getAttribute('data-key');
-    // console.log(this.keyButton);
 
     let currValue;
 
@@ -49,33 +57,31 @@ export default class Key {
       // backspace - remove last char from textarea
       if (cursorPosStart > 0 || (cursorPosStart === 0 && cursorPosEnd !== 0)) {
         currValue = textBefore.slice(0, textBefore.length - 1);
-        this.textarea.value = `${currValue}${textAfter}`;
-        this.textarea.selectionStart = cursorPosStart - 1;
-        this.textarea.selectionEnd = cursorPosStart - 1;
+        textarea.value = `${currValue}${textAfter}`;
+        textarea.selectionStart = cursorPosStart - 1;
+        textarea.selectionEnd = cursorPosStart - 1;
       }
     } else if (buttonAttr === 'Tab') {
       // tab - add two space
       currValue = '  ';
-      this.textarea.value = `${textBefore}${currValue}${textAfter}`;
-      this.textarea.selectionStart = cursorPosStart + 2;
-      this.textarea.selectionEnd = cursorPosStart + 2;
+      textarea.value = `${textBefore}${currValue}${textAfter}`;
+      textarea.selectionStart = cursorPosStart + 2;
+      textarea.selectionEnd = cursorPosStart + 2;
     } else if (buttonAttr === 'Delete') {
       // del - remove prev char from the textarea
       if (cursorPosEnd < this.textarea.value.length) {
-        this.textarea.value = `${textBefore}${textAfter.slice(1)}`;
-        this.textarea.selectionStart = cursorPosStart;
-        this.textarea.selectionEnd = cursorPosStart;
+        textarea.value = `${textBefore}${textAfter.slice(1)}`;
+        textarea.selectionStart = cursorPosStart;
+        textarea.selectionEnd = cursorPosStart;
       }
     } else if (
       buttonAttr === 'CapsLock' ||
       buttonAttr === 'ShiftLeft' ||
       buttonAttr === 'ShiftRight'
     ) {
-      // capsLock - change to set
-      // shiftLeft, shiftRight - change set
-      // TODO: add capslock values
-      this.textarea.selectionStart = cursorPosStart;
-      this.textarea.selectionEnd = cursorPosStart;
+      textarea.selectionStart = cursorPosStart;
+      textarea.selectionEnd = cursorPosStart;
+      this.toggleUpperCase(buttonAttr);
     } else if (
       buttonAttr === 'ControlLeft' ||
       buttonAttr === 'AltLeft' ||
@@ -84,28 +90,50 @@ export default class Key {
       buttonAttr === 'MetaLeft'
     ) {
       // ctrlLeft, altLeft, altRight, ctrlRight, win - nothing
-      this.textarea.selectionStart = cursorPosStart;
-      this.textarea.selectionEnd = cursorPosStart;
+      textarea.selectionStart = cursorPosStart;
+      textarea.selectionEnd = cursorPosStart;
     } else if (buttonAttr === 'Enter') {
       // enter - move coursor to the new line
-      this.textarea.value = `${textBefore}\n${textAfter}`;
-      this.textarea.selectionStart = cursorPosStart + 1;
-      this.textarea.selectionEnd = cursorPosStart + 1;
+      textarea.value = `${textBefore}\n${textAfter}`;
+      textarea.selectionStart = cursorPosStart + 1;
+      textarea.selectionEnd = cursorPosStart + 1;
     } else {
       currValue = this.keyButton.innerHTML;
-      this.textarea.value = `${textBefore}${currValue}${textAfter}`;
-      this.textarea.selectionStart = cursorPosStart + 1;
-      this.textarea.selectionEnd = cursorPosStart + 1;
+      textarea.value = `${textBefore}${currValue}${textAfter}`;
+      textarea.selectionStart = cursorPosStart + 1;
+      textarea.selectionEnd = cursorPosStart + 1;
     }
   }
 
-  //   //private method to set active class to clicked key and display it in textarea
-  //   #triggerEvent(handlerName) {
-  //     console.log(`event name ${handlerName}`);
-  //   }
+  toggleUpperCase(buttonAttr) {
+    if (buttonAttr === 'CapsLock') {
+      console.log(this.CapsIsOn);
+      if (!this.keyboard.CapsIsOn) {
+        console.log('was false now true');
+        this.keyboard.CapsIsOn = true;
+        this.keyboard.switchKeyboard();
+      } else if (this.keyboard.CapsIsOn) {
+        console.log('was true now false');
+        this.keyboard.CapsIsOn = false;
+        this.keyboard.switchKeyboard();
+      }
+    }
 
-  //   //private method for caps lock turned on / off
-  //   #toggleCapsLock() {
-  //     console.log(`caps lock toggled`);
-  //   }
+    if (buttonAttr === 'ShiftLeft') { // TODO: change all like caps now, but if one shift is pressed other is disabled
+      if (this.shiftLeftIsOn) {
+        console.log('here');
+      } else {
+        this.keyboard.shiftLeftIsOn = true;
+      }
+    }
+
+    if (buttonAttr === 'ShiftRight') {
+      if (this.shiftRightIsOn) {
+        console.log('here');
+      } else {
+        this.keyboard.shiftLeftIsOn = true;
+      }
+    }
+    console.log('done');
+  }
 }

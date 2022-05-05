@@ -11,6 +11,10 @@ class Keyboard {
     this.keys = {};
     this.section = this.setKeyboard();
     this.eventListenersHandler();
+
+    this.shiftLeftIsOn = false;
+    this.shiftRightIsOn = false;
+    this.CapsIsOn = false;
   }
 
   // method to create a section with board and buttons inside
@@ -25,13 +29,26 @@ class Keyboard {
       row.forEach((keyName) => {
         const button = new Key(keyName, this.textarea);
         this.keys[keyName] = button; // set the whole class
+        button.keyboard = this; // set the keybard properties to the button class;
         rowEl.append(button.keyButton); // append the element
-        // button.keyButton.addEventListener('mouseenter', this.hoverKeyHandler);
       });
       keyboard.append(rowEl);
     });
 
     return keyboard;
+  }
+
+  // if shift/ capslock / lang changed
+  switchKeyboard() {
+    Object.values(this.keys).forEach((key) => {
+      const { keyButton } = key;
+      console.log(this.CapsIsOn);
+      if (this.CapsIsOn && key.value.length === 1) {
+        keyButton.innerHTML = key.value.toUpperCase();
+      } else if (!this.CapsIsOn && key.value.length === 1) {
+        keyButton.innerHTML = key.value.toLowerCase();
+      }
+    });
   }
 
   // add event listeners on press(document) and click/hover(keyboard section only)
@@ -46,8 +63,12 @@ class Keyboard {
       this.mouseEventHandler(event);
     });
     Object.values(this.keys).forEach((key) => {
-      key.keyButton.addEventListener('mouseenter', () => key.keyButton.classList.add('hover'));
-      key.keyButton.addEventListener('mouseout', () => key.keyButton.classList.remove('hover'));
+      key.keyButton.addEventListener('mouseenter', () => {
+        key.keyButton.classList.add('hover');
+      });
+      key.keyButton.addEventListener('mouseout', () => {
+        key.keyButton.classList.remove('hover');
+      });
     });
   }
 
@@ -82,8 +103,16 @@ class Keyboard {
     currButton.keyButton.classList.add('active');
 
     // if button unpressed or cursor leaves the button element
-    currButton.keyButton.addEventListener('mouseout', this.removeActiveClass, false);
-    currButton.keyButton.addEventListener('mouseup', this.removeActiveClass, false);
+    currButton.keyButton.addEventListener(
+      'mouseout',
+      this.removeActiveClass,
+      false,
+    );
+    currButton.keyButton.addEventListener(
+      'mouseup',
+      this.removeActiveClass,
+      false,
+    );
   }
 
   // for mouseEventHandler => if button unpressed or cursor leaves the button element
