@@ -1,5 +1,6 @@
 import Keyboard from './components/keyboard';
 import DOMHelper from './utility/DOMHelper';
+import Language from './utility/localStorageHelper';
 
 // main layout
 export default class App {
@@ -19,8 +20,9 @@ export default class App {
     textareaSectionEl.append(textareaEl);
     wrapperEl.append(textareaSectionEl);
 
+    console.log(Language.getStorage('lang'));
     // create keyboard
-    const keyBoardEl = new Keyboard(textareaEl).section;
+    const keyBoardEl = new Keyboard(textareaEl, Language.getStorage('lang')).section;
     wrapperEl.append(keyBoardEl);
 
     // create footer

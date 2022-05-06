@@ -3,15 +3,10 @@ import data from '../data/keysData';
 
 export default class Key {
   constructor(keyName, lang) {
+    this.lang = lang;
     this.keyName = keyName;
     this.keyData = this.setData();
-    this.en = this.keyData.en;
-    this.ru = this.keyData.ru;
-    this.valOnShift = this.keyData.valueOnShift;
     this.keyButton = this.createKey();
-    this.buttonActive = false;
-
-    this.lang = lang;
   }
 
   setData() {
@@ -21,8 +16,8 @@ export default class Key {
       if (data[i].keyName === this.keyName) {
         keyData = data[i];
         this.keyData = keyData;
-        this.value = keyData.value;
-        this.valOnShift = keyData.valueOnShift;
+        this.en = this.keyData.en;
+        this.ru = this.keyData.ru;
         break;
       }
     }
@@ -30,13 +25,18 @@ export default class Key {
   }
 
   createKey() {
+    // get the array of curr values depending on the language => en: ['d', 'D'], ru: ['в', 'В'],
+    const currLangVal = this.lang === 'en' ? this.en : this.ru;
+    this.currValue = currLangVal[0];
+
     const button = DOMHelper.createEl('button', {
       class: ['keyboard__key'],
-      text: this.en[0],
+      text: currLangVal[0],
       type: 'button',
       attr: this.keyName,
     });
 
+    // add green button for capslock indicator
     if (this.keyName === 'CapsLock') {
       const capsIndicator = DOMHelper.createEl('div', {
         class: ['key__capsLock'],
@@ -47,8 +47,12 @@ export default class Key {
     return button;
   }
 
+  setNewValue(newValue) {
+    this.currValue = newValue;
+  }
+
   textareaHandler() {
-    // set the cursor in the textarea (this.keyboard => keyboard class object)
+    // set the cursor in the textarea;
     const { textarea } = this.keyboard;
     textarea.focus();
 
@@ -76,7 +80,7 @@ export default class Key {
       textarea.selectionStart = cursorPosStart + 1;
       textarea.selectionEnd = cursorPosStart + 1;
     } else if (buttonAttr === 'Delete') {
-      if (cursorPosEnd < this.textarea.value.length) {
+      if (cursorPosEnd < textarea.value.length) {
         textarea.value = `${textBefore}${textAfter.slice(1)}`;
         textarea.selectionStart = cursorPosStart;
         textarea.selectionEnd = cursorPosStart;
@@ -96,8 +100,6 @@ export default class Key {
       buttonAttr === 'ControlRight' ||
       buttonAttr === 'MetaLeft'
     ) {
-      // ctrlLeft, altLeft, altRight, ctrlRight - switch lang
-      // win - nothing
       this.switchLangCases(buttonAttr, this.keyButton);
       textarea.selectionStart = cursorPosStart;
       textarea.selectionEnd = cursorPosStart;
@@ -106,8 +108,7 @@ export default class Key {
       textarea.selectionStart = cursorPosStart + 1;
       textarea.selectionEnd = cursorPosStart + 1;
     } else {
-      currValue = this.keyButton.innerHTML;
-      textarea.value = `${textBefore}${currValue}${textAfter}`;
+      textarea.value = `${textBefore}${this.currValue}${textAfter}`;
       textarea.selectionStart = cursorPosStart + 1;
       textarea.selectionEnd = cursorPosStart + 1;
     }
@@ -125,6 +126,7 @@ export default class Key {
 
   toggleUpperCase(buttonAttr, key) {
     const { CapsIsOn, shiftLeftIsOn, shiftRightIsOn } = this.keyboard;
+
     if (buttonAttr === 'CapsLock') {
       if (!CapsIsOn) {
         this.keyboard.CapsIsOn = true;
@@ -172,6 +174,7 @@ export default class Key {
   }
 
   removeMouseEvents = () => {
+    // if curr button was shift to switch the case
     if (this.keyName === 'ShiftLeft' || this.keyName === 'ShiftRight') {
       this.toggleUpperCase(this.keyName, this.keyButton);
     }
