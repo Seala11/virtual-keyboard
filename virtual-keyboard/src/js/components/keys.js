@@ -2,15 +2,16 @@ import DOMHelper from '../utility/DOMHelper';
 import data from '../data/keysData';
 
 export default class Key {
-  constructor(keyName) {
+  constructor(keyName, lang) {
     this.keyName = keyName;
     this.keyData = this.setData();
     this.en = this.keyData.en;
+    this.ru = this.keyData.ru;
     this.valOnShift = this.keyData.valueOnShift;
     this.keyButton = this.createKey();
     this.buttonActive = false;
 
-    this.lang = 'en';
+    this.lang = lang;
   }
 
   setData() {
@@ -71,10 +72,9 @@ export default class Key {
         textarea.selectionEnd = cursorPosStart - 1;
       }
     } else if (buttonAttr === 'Tab') {
-      currValue = '  ';
-      textarea.value = `${textBefore}${currValue}${textAfter}`;
-      textarea.selectionStart = cursorPosStart + 2;
-      textarea.selectionEnd = cursorPosStart + 2;
+      textarea.value = `${textBefore}\t${textAfter}`;
+      textarea.selectionStart = cursorPosStart + 1;
+      textarea.selectionEnd = cursorPosStart + 1;
     } else if (buttonAttr === 'Delete') {
       if (cursorPosEnd < this.textarea.value.length) {
         textarea.value = `${textBefore}${textAfter.slice(1)}`;
@@ -96,7 +96,9 @@ export default class Key {
       buttonAttr === 'ControlRight' ||
       buttonAttr === 'MetaLeft'
     ) {
-      // ctrlLeft, altLeft, altRight, ctrlRight, win - nothing
+      // ctrlLeft, altLeft, altRight, ctrlRight - switch lang
+      // win - nothing
+      this.switchLangCases(buttonAttr, this.keyButton);
       textarea.selectionStart = cursorPosStart;
       textarea.selectionEnd = cursorPosStart;
     } else if (buttonAttr === 'Enter') {
@@ -108,6 +110,16 @@ export default class Key {
       textarea.value = `${textBefore}${currValue}${textAfter}`;
       textarea.selectionStart = cursorPosStart + 1;
       textarea.selectionEnd = cursorPosStart + 1;
+    }
+  }
+
+  switchLangCases(buttonAttr) {
+    if (buttonAttr === 'MetaLeft') return;
+    if (buttonAttr === 'ControlLeft' || buttonAttr === 'ControlRight') {
+      this.keyboard.ControlIsOn = true;
+    }
+    if (buttonAttr === 'AltLeft' || buttonAttr === 'AltRight') {
+      this.keyboard.AltIsOn = true;
     }
   }
 
@@ -160,10 +172,7 @@ export default class Key {
   }
 
   removeMouseEvents = () => {
-    if (
-      this.keyName === 'ShiftLeft' ||
-      this.keyName === 'ShiftRight'
-    ) {
+    if (this.keyName === 'ShiftLeft' || this.keyName === 'ShiftRight') {
       this.toggleUpperCase(this.keyName, this.keyButton);
     }
 

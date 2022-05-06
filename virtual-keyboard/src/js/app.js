@@ -29,7 +29,7 @@ export default class App {
       text: 'The keyboard was created in the Windows OS.',
     });
     const text2El = DOMHelper.createEl('p', {
-      text: 'To switch between keyboard layouts, press Alt+Shift.',
+      text: 'To switch between keyboard layouts, press Ctr+Alt.',
     });
     footerEl.append(text1El);
     footerEl.append(text2El);

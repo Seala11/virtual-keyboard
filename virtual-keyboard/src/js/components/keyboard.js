@@ -1,5 +1,3 @@
-// keyboard element
-
 import DOMHelper from '../utility/DOMHelper';
 import Key from './keys';
 import keysLayout from '../data/keysLayout';
@@ -15,6 +13,9 @@ class Keyboard {
     this.shiftLeftIsOn = false;
     this.shiftRightIsOn = false;
     this.CapsIsOn = false;
+    this.ControlIsOn = false;
+    this.AltIsOn = false;
+    this.lang = 'en';
   }
 
   // create a section with keyboard and buttons inside
@@ -27,7 +28,7 @@ class Keyboard {
     this.keysLayout.forEach((row) => {
       const rowEl = DOMHelper.createEl('div', { class: ['keyboard__keys'] });
       row.forEach((keyName) => {
-        const button = new Key(keyName, this.textarea);
+        const button = new Key(keyName, this.textarea, this.lang);
         this.keys[keyName] = button; // set the whole class
         button.keyboard = this; // set the keybard properties to the button class;
         rowEl.append(button.keyButton); // append the element
@@ -38,24 +39,26 @@ class Keyboard {
     return keyboard;
   }
 
-  // if shift/ capslock / lang changed
+  // if shift/ capslock
   switchKeyboard(buttonAttr) {
     const shiftIsPressed =
       buttonAttr === 'ShiftLeft' || buttonAttr === 'ShiftRight';
     const capsLockIsPressed = buttonAttr === 'CapsLock';
+    console.log(buttonAttr)
 
     Object.values(this.keys).forEach((key) => {
-      const { keyButton, en } = key;
+      const { keyButton } = key;
+
+      const currLangVal = this.lang === 'en' ? key.en : key.ru;
 
       if (shiftIsPressed) {
-        const currVal = keyButton.innerHTML; // 'a'
-        const currLang = en; // ['a', 'A']
-        if (currLang[1] === null) return; // ['Delete', null]
+        const currVal = keyButton.innerHTML;
+        if (currLangVal[1] === null) return; // ['Delete', null]
         keyButton.innerHTML =
-          currVal === currLang[0] ? currLang[1] : currLang[0];
+          currVal === currLangVal[0] ? currLangVal[1] : currLangVal[0];
       }
 
-      if (capsLockIsPressed && en[0].length === 1) {
+      if (capsLockIsPressed && currLangVal[0].length === 1) {
         const currVal = keyButton.innerHTML;
         let changedVal;
         if (currVal.toUpperCase() === currVal) {
@@ -67,6 +70,33 @@ class Keyboard {
         // keyButton.innerHTML = currVal.toUpperCase() === currVal
         //     ? currVal.toLowerCase()
         //     : currVal.toUpperCase();
+      }
+    });
+  }
+
+  switchLang() {
+    // switch the lang
+    const prevLang = this.lang; // 'en' or 'ru'
+    this.lang = this.lang === 'en' ? 'ru' : 'en';
+
+    Object.values(this.keys).forEach((key) => {
+      const prevLangValues = prevLang === 'en' ? key.en : key.ru; // set the arr of values before change ['m', 'M']
+      const { keyButton } = key;
+
+      // switch the lang values
+      const changedLangVal = prevLangValues === key.en ? key.ru : key.en;
+      const { innerHTML } = keyButton;
+
+      // ['Delete', null] - skip if they are the same at both lang
+      if (changedLangVal[1] !== null) {
+        // currLangVal it curr text value
+        if (innerHTML === prevLangValues[0]) {
+          // if it was lowercase value
+          [keyButton.innerHTML] = changedLangVal;
+        } else {
+          // if it was caps lock / shift value => leave it as shift
+          keyButton.innerHTML = changedLangVal[1];
+        }
       }
     });
   }
@@ -101,11 +131,30 @@ class Keyboard {
     const currButton = this.keys[keyAttr];
     const currBtnIsShift =
       currButton.keyName === 'ShiftLeft' || currButton.keyName === 'ShiftRight';
+    const currBtnIsControl =
+      currButton.keyName === 'ControlLeft' ||
+      currButton.keyName === 'ControlRight';
+    const currBtnIsAlt =
+      currButton.keyName === 'AltLeft' || currButton.keyName === 'AltRight';
 
     // KEYUP EVENTS
     if (event.type === 'keyup') {
+    //   shift unpressed
       if (currBtnIsShift) {
         currButton.textareaHandler();
+      }
+
+      // switch lang cases
+      if (currBtnIsControl && this.AltIsOn) {
+        this.ControlIsOn = false;
+        this.AltIsOn = false;
+        console.log('cse 1 unpressed', this.AltIsOn, this.ControlIsOn);
+      }
+
+      if (currBtnIsAlt && this.ControlIsOn) {
+        this.AltIsOn = false;
+        this.ControlIsOn = false;
+        console.log('cse 2 unpressed', this.AltIsOn, this.ControlIsOn);
       }
 
       setTimeout(() => {
@@ -122,8 +171,23 @@ class Keyboard {
         return;
       }
 
-      // prevent shift on/off while keydowm or other shift pressed
-      if (currBtnIsShift && (this.shiftLeftIsOn || this.shiftRightIsOn)) {
+      if (currBtnIsShift && event.repeat) {
+        console.log('this should stop shift');
+        return;
+      }
+
+      // switch lang cases
+      if (currBtnIsControl && this.AltIsOn) {
+        currButton.keyButton.classList.add('active');
+        console.log('switch alt pressed');
+        this.switchLang();
+        return;
+      }
+
+      if (currBtnIsAlt && this.ControlIsOn) {
+        currButton.keyButton.classList.add('active');
+        console.log('switch ctr pressed');
+        this.switchLang();
         return;
       }
 
