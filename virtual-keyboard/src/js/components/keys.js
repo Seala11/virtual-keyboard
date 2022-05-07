@@ -27,7 +27,7 @@ export default class Key {
   createKey() {
     // get the array of curr values depending on the language => en: ['d', 'D'], ru: ['в', 'В'],
     const currLangVal = this.lang === 'en' ? this.en : this.ru;
-    this.currValue = currLangVal[0];
+    this.setNewValue(currLangVal[0]);
 
     const button = DOMHelper.createEl('button', {
       class: ['keyboard__key'],
@@ -86,19 +86,19 @@ export default class Key {
         textarea.selectionEnd = cursorPosStart;
       }
     } else if (
-      buttonAttr === 'CapsLock' ||
-      buttonAttr === 'ShiftLeft' ||
-      buttonAttr === 'ShiftRight'
+      buttonAttr === 'CapsLock'
+      || buttonAttr === 'ShiftLeft'
+      || buttonAttr === 'ShiftRight'
     ) {
       textarea.selectionStart = cursorPosStart;
       textarea.selectionEnd = cursorPosStart;
       this.toggleUpperCase(buttonAttr, this.keyButton);
     } else if (
-      buttonAttr === 'ControlLeft' ||
-      buttonAttr === 'AltLeft' ||
-      buttonAttr === 'AltRight' ||
-      buttonAttr === 'ControlRight' ||
-      buttonAttr === 'MetaLeft'
+      buttonAttr === 'ControlLeft'
+      || buttonAttr === 'AltLeft'
+      || buttonAttr === 'AltRight'
+      || buttonAttr === 'ControlRight'
+      || buttonAttr === 'MetaLeft'
     ) {
       this.switchLangCases(buttonAttr, this.keyButton);
       textarea.selectionStart = cursorPosStart;
@@ -174,7 +174,7 @@ export default class Key {
   }
 
   removeMouseEvents = () => {
-    // if curr button was shift to switch the case
+    // if current button was shift to switch the case
     if (this.keyName === 'ShiftLeft' || this.keyName === 'ShiftRight') {
       this.toggleUpperCase(this.keyName, this.keyButton);
     }

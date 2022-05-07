@@ -20,9 +20,9 @@ export default class App {
     textareaSectionEl.append(textareaEl);
     wrapperEl.append(textareaSectionEl);
 
-    console.log(Language.getStorage('lang'));
     // create keyboard
-    const keyBoardEl = new Keyboard(textareaEl, Language.getStorage('lang')).section;
+    const keyBoardEl = new Keyboard(textareaEl, Language.getStorage('lang'))
+      .section;
     wrapperEl.append(keyBoardEl);
 
     // create footer
@@ -41,28 +41,3 @@ export default class App {
     document.body.append(wrapperEl);
   }
 }
-
-// layout example
-/* <div class="wrapper">
-<header>
-  <h1>RSS Virtual Keyboard</h1>
-</header>
-<section class="text">
-  <textarea class="textarea"></textarea>
-</section>
-<section class="keyboard">
-  <div class="keyboard__keys">
-    <button type="button" class="keyboard__key">A</button>
-    <button type="button" class="keyboard__key keyboard__key--wide-1">Shift</button>
-    <button type="button" class="keyboard__key keyboard__key--wide-2">space</button>
-    <button type="button" class="keyboard__key">A</button>
-    <button type="button" class="keyboard__key">A</button>
-    <button type="button" class="keyboard__key">A</button>
-    <button type="button" class="keyboard__key">A</button>
-  </div>
-</section>
-<footer class="footer">
-  <p>The keyboard was created in the Windows OS</p>
-  <p>To switch between keyboard layouts, press Alt+Shift.</p>
-</footer>
-</div> */

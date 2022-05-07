@@ -42,43 +42,42 @@ class Keyboard {
 
   // if shift/ capslock
   switchKeyboard(buttonAttr) {
-    const shiftForLangSwitch =
-      buttonAttr === undefined && (this.shiftLeftIsOn || this.shiftRightIsOn);
+    const shiftIsOn = this.shiftLeftIsOn || this.shiftRightIsOn;
+    const shiftForLangSwitch = buttonAttr === undefined && shiftIsOn;
     const capsForLangSwitch = buttonAttr === undefined && this.CapsIsOn;
-    const shiftIsPressed =
-      buttonAttr === 'ShiftLeft' || buttonAttr === 'ShiftRight';
+    const shiftIsPressed = buttonAttr === 'ShiftLeft' || buttonAttr === 'ShiftRight';
     const capsLockIsPressed = buttonAttr === 'CapsLock';
 
     Object.values(this.keys).forEach((key) => {
       const { keyButton } = key;
-
-      const currLangVal = this.lang === 'en' ? key.en : key.ru;
+      // currLangVal [0] [1]
+      const [valLowerCase, valUpperCase] = this.lang === 'en' ? key.en : key.ru;
       const currVal = keyButton.innerHTML;
 
       if (shiftIsPressed || shiftForLangSwitch) {
-        if (currLangVal[1] === null) return; // ['Delete', null]
+        if (valUpperCase === null) return; // ['Delete', null]
         let changedVal;
-        if (currVal === currLangVal[0]) {
-          changedVal = currLangVal[1];
-          key.setNewValue(currLangVal[1]);
+        if (currVal === valLowerCase) {
+          changedVal = valUpperCase;
+          key.setNewValue(valUpperCase);
         } else {
-          changedVal = currLangVal[0];
-          key.setNewValue(currLangVal[0]);
+          changedVal = valLowerCase;
+          key.setNewValue(valLowerCase);
         }
         keyButton.innerHTML = changedVal;
       }
 
       if (
-        (capsLockIsPressed || capsForLangSwitch) &&
-        currLangVal[0].length === 1
+        (capsLockIsPressed || capsForLangSwitch)
+        && valLowerCase.length === 1
       ) {
         let changedVal;
         if (currVal.toUpperCase() === currVal) {
           changedVal = currVal.toLowerCase();
-          key.setNewValue(currLangVal[0]);
+          key.setNewValue(valLowerCase);
         } else {
           changedVal = currVal.toUpperCase();
-          key.setNewValue(currLangVal[1]);
+          key.setNewValue(valUpperCase);
         }
         keyButton.innerHTML = changedVal;
       }
@@ -87,20 +86,19 @@ class Keyboard {
 
   switchLang() {
     // switch the lang
-    const prevLang = this.lang; // 'en' or 'ru'
     this.lang = this.lang === 'en' ? 'ru' : 'en';
 
     Object.values(this.keys).forEach((key) => {
-      const prevLangValues = prevLang === 'en' ? key.en : key.ru; // set the arr of values before change ['m', 'M']
       const { keyButton } = key;
       if (key.keyName === 'CapsLock') return; // it has caps lock indicator inside
 
-      // switch the lang values
-      const changedLangVal = prevLangValues === key.en ? key.ru : key.en;
-      keyButton.innerHTML = changedLangVal[0];
-      key.setNewValue(changedLangVal[0]);
+      // switch the lang values, set with the lowerCase first
+      const [changedLangVal] = this.lang === 'en' ? key.en : key.ru;
+      keyButton.innerHTML = changedLangVal;
+      key.setNewValue(changedLangVal);
     });
 
+    // check if there is caps lock or shift pressed
     this.switchKeyboard();
     Language.setStorage('lang', `${this.lang.toString()}`);
   }
@@ -133,23 +131,18 @@ class Keyboard {
     // find the button code that pressed
     const keyAttr = event.code;
     const currButton = this.keys[keyAttr];
-    const currBtnIsShift =
-      currButton.keyName === 'ShiftLeft' || currButton.keyName === 'ShiftRight';
-    const currBtnIsControl =
-      currButton.keyName === 'ControlLeft' ||
-      currButton.keyName === 'ControlRight';
-    const currBtnIsAlt =
-      currButton.keyName === 'AltLeft' || currButton.keyName === 'AltRight';
+    const currBtnIsShift = currButton.keyName === 'ShiftLeft' || currButton.keyName === 'ShiftRight';
+    const currBtnIsControl = currButton.keyName === 'ControlLeft'
+      || currButton.keyName === 'ControlRight';
+    const currBtnIsAlt = currButton.keyName === 'AltLeft' || currButton.keyName === 'AltRight';
 
     // KEYUP EVENTS
     if (event.type === 'keyup') {
       //   shift unpressed
-
       if (
-        (currButton.keyName === 'ShiftLeft' && this.shiftLeftIsOn) ||
-        (currButton.keyName === 'ShiftRight' && this.shiftRightIsOn)
+        (currButton.keyName === 'ShiftLeft' && this.shiftLeftIsOn)
+        || (currButton.keyName === 'ShiftRight' && this.shiftRightIsOn)
       ) {
-        // console.log('keyup', this, this.shiftLeftIsOn, this.shiftRightIsOn);
         currButton.textareaHandler();
       }
 
@@ -172,17 +165,17 @@ class Keyboard {
     } else {
       // prevent capsLock on/off while keydowm
       if (
-        currButton.keyName === 'CapsLock' &&
-        currButton.keyButton.classList.contains('active')
+        currButton.keyName === 'CapsLock'
+        && currButton.keyButton.classList.contains('active')
       ) {
         return;
       }
 
       // prevent shift on/off while keydowm
       if (
-        (currBtnIsShift && event.repeat) ||
-        (currBtnIsShift && this.shiftLeftIsOn) ||
-        (currBtnIsShift && this.shiftRightIsOn)
+        (currBtnIsShift && event.repeat)
+        || (currBtnIsShift && this.shiftLeftIsOn)
+        || (currBtnIsShift && this.shiftRightIsOn)
       ) {
         return;
       }
@@ -212,8 +205,7 @@ class Keyboard {
 
     // get button element, add text to textarea, set active class
     const currButton = this.keys[buttonAttr];
-    const currBtnIsShift =
-      currButton.keyName === 'ShiftLeft' || currButton.keyName === 'ShiftRight';
+    const currBtnIsShift = currButton.keyName === 'ShiftLeft' || currButton.keyName === 'ShiftRight';
 
     // to prevent double shift clicked
     if (currBtnIsShift && (this.shiftLeftIsOn || this.shiftRightIsOn)) {
