@@ -1,11 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'production',
-  devtool: false, //evel remove
+  devtool: false, // evel remove
   entry: path.resolve(__dirname, './src/script.js'),
   output: {
     filename: '[name].[contenthash].js',

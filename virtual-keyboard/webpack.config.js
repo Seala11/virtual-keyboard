@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
-  devtool: 'source-map', //false => evel remove
+  devtool: 'source-map', // false => evel remove
   entry: path.resolve(__dirname, './src/script.js'),
   output: {
     filename: '[name].js',
