@@ -1,0 +1,8 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use '../base/typography' as *;
+
+.wrapper {
+    margin: 0 auto;
+    max-width: $main-width;
+}

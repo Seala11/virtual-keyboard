@@ -1,0 +1,18 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use '../base/typography' as *;
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  @include roboto();
+  background: $light-m;
+}
+
+h1 {
+  @include roboto($fw: 700, $fs: 2rem);
+  text-align: center;
+}

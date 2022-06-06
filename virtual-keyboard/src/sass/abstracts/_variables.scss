@@ -1,0 +1,26 @@
+$light: rgba(255, 255, 255, 1); // white
+$light-s: rgba(236, 239, 249, 1);
+$light-m: rgba(205, 210, 219, 1);
+$light-x: rgba(221, 227, 236, 1);
+$light-xl: rgba(253, 253, 254, 1);
+$light-xxl: rgba(176, 184, 198, 1);
+
+
+$dark-s: rgba(80, 98, 130, 1);
+$dark-m: rgba(72, 81, 97, 1);
+
+$active: rgb(185 251 192);
+$active-l: rgb(236 255 238);
+$active-m: rgb(87 104 101);
+$active-x: rgb(134 186 161);
+
+
+$active-inner: rgba(43, 211, 90, 1);
+$active-border: rgba(43, 208, 89, 1);
+
+$gradient-main: linear-gradient(99.87deg, $light-s 0.08%, $light 100%);
+$gradienr-btn: linear-gradient(135deg, $light-x 0%, $light-xl 100%);
+$gradient-btn-active: linear-gradient(135deg, $active 0%, $active-l 100%);
+
+// width
+$main-width: 740px;
